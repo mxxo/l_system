@@ -14,7 +14,7 @@ class Point { //a simple 2D point class
   int y_;
 
 public:
-  Point() : x_(0), y_(0) {} //Point must be default constructible
+  
   Point(int x, int y) : x_(x), y_(y) {}
   auto x() const { return x_; }
   auto y() const { return y_; }
