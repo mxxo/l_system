@@ -1,6 +1,6 @@
 //Demonstration of using a custom type for the L-System's representation
 //An actual L-System with a point representation would likely be parametarized to be useful
-//this solely serves to show what is required for enabling custom representation types
+//This solely serves to show what is required for enabling custom representation types
 
 #include <iostream>
 #include <cassert>

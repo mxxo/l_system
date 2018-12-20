@@ -16,7 +16,7 @@ int main(int argc, char const *argv[]) {
 
   //define symbol types. Any type can be passed to the constructor, so long as they are hashable.
   LSymbolType A('A'); //true / false, 5 / 6, -0.33 / 99999.3, anything goes
-  LSymbolType B('B'); //if a custom type is used, a custom hash function can be passed to the LSystem constructor.
+  LSymbolType B('B'); //if a custom type is used, a custom hash type can be passed to the LSystem constructor.
 
   LSymbol A_(&A); //define symbols needed for axiom and rules
   LSymbol B_(&B);
@@ -28,6 +28,8 @@ int main(int argc, char const *argv[]) {
 
   algae.setRule(&A, A_AB); //add the rules to the system
   algae.setRule(&B, B_A);
+
+  std::cout << "Algae axiom: " << represent(algae.axiom()) << '\n'; //the represent function can turn an l system into something readable
 
   std::cout << "Algae generation " << generation << ": " << represent(algae.generate(generation)) << '\n'; //generate a generation
 
