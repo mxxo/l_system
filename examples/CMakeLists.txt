@@ -1,4 +1,4 @@
-include_directories(${Lindenmayer++_SOURCE_DIR}/include)
+include_directories(${l_system_SOURCE_DIR}/include)
 
-#add_executable(x x.cpp)
+add_executable(algae algae.cpp)
 #target_link_libraries(x ${LIBS})
