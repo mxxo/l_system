@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <numeric>
+#include <iterator>
 #include <functional>
 #include <sstream>
 
@@ -63,7 +64,7 @@ namespace l_system {
   };
 
   template <typename T>
-  using LString = std::basic_string<LSymbol<T>>;
+  using LString = std::vector<LSymbol<T>>;
 
   template <typename T>
   auto represent(const LString<T>& lstring) noexcept -> std::string {
@@ -138,7 +139,7 @@ namespace l_system {
 
           if(symbolIsTerminal) {
 
-            symbolReplacement.push_back(*symbol);
+            symbolReplacement.emplace_back(*symbol);
           }
           else {
 
@@ -150,7 +151,12 @@ namespace l_system {
           result.emplace_back(symbolReplacement);
         }
 
-        current = std::accumulate(result.begin(), result.end(), LString<T>());
+        current = LString<T>();
+
+        for(auto& res : result) {
+
+          current.insert(current.end(), std::make_move_iterator(res.begin()), std::make_move_iterator(res.end()));
+        }
       }
 
       return current;
