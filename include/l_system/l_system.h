@@ -9,16 +9,17 @@
 
 namespace l_system {
 
+  template <typename T>
   class LSymbolType {
 
-    char representation_;
+    T representation_;
 
-  public:
+    public:
 
     LSymbolType() {}
-    LSymbolType(char representation) : representation_(representation) {}
+    LSymbolType(T representation) : representation_(representation) {}
 
-    [[nodiscard]] auto representation() const noexcept -> char {
+    auto representation() const noexcept -> T {
 
       return representation_;
     }
@@ -29,39 +30,48 @@ namespace l_system {
     }
   };
 
-  static LSymbolType NullLSymbol;
+  template <typename T>
+  LSymbolType<T>* NullLSymbol() {
 
-  template <typename RepresentationHash = std::hash<char>>
+    static LSymbolType<T>* res = new LSymbolType<T>();
+
+    return res;
+  }
+
+  template <typename T, typename H = std::hash<T>>
   struct LSymbolTypeHash {
 
-    size_t operator()(const LSymbolType& k) const {
+    size_t operator()(const LSymbolType<T>& k) const {
 
-      return RepresentationHash()(k.representation());
+      return H()(k.representation());
     }
   };
 
+  template <typename T>
   class LSymbol {
 
-    LSymbolType* type_;
+    LSymbolType<T>* type_;
 
   public:
-    LSymbol(LSymbolType* type) : type_(type) {}
+    LSymbol(LSymbolType<T>* type) : type_(type) {}
 
-    LSymbol() : type_(&NullLSymbol) {}
+    LSymbol() : type_(NullLSymbol<T>()) {}
 
-    [[nodiscard]] auto type() const noexcept -> LSymbolType* {
+     auto type() const noexcept -> LSymbolType<T>* {
 
       return type_;
     }
   };
 
-  typedef std::basic_string<LSymbol> LString;
+  template <typename T>
+  using LString = std::basic_string<LSymbol<T>>;
 
-  [[nodiscard]] auto represent(const LString& lstring) noexcept -> std::basic_string<char> {
+  template <typename T>
+   auto represent(const LString<T>& lstring) noexcept -> std::basic_string<T> {
 
-    std::basic_string<char> representation;
+    std::basic_string<T> representation;
 
-    for(LSymbol symbol : lstring) {
+    for(LSymbol<T> symbol : lstring) {
 
       representation.push_back(symbol.type()->representation());
     }
@@ -69,56 +79,63 @@ namespace l_system {
     return representation;
   }
 
+  template <typename T>
   class LRule {
 
-    LString result_;
+    LString<T> result_;
 
   public:
 
-    LRule(LString result) : result_(result) {}
+    LRule(LString<T> result) : result_(result) {}
 
-    [[nodiscard]] auto operator()([[maybe_unused]] LString before, [[maybe_unused]] LString after) const noexcept -> LString {
+    LRule(std::initializer_list<LSymbol<T>> result) : result_(result) {}
+
+     auto operator()([[maybe_unused]] LString<T> before, [[maybe_unused]] LString<T> after) const noexcept -> LString<T> {
 
       return result_;
     }
   };
 
+  template <typename T>
   class LSystem {
 
-    LString axiom_;
-    std::unordered_map<LSymbolType, LRule, LSymbolTypeHash<>> rules;
+    LString<T> axiom_;
+    std::unordered_map<LSymbolType<T>, LRule<T>, LSymbolTypeHash<T>> rules;
 
   public:
 
-    void addRule(LSymbolType* type, LRule rule) noexcept {
+    LSystem(LString<T> axiom) : axiom_(axiom) {}
+    LSystem(std::initializer_list<LSymbol<T>> axiom) : axiom_(axiom) {}
+
+    void addRule(LSymbolType<T>* type, LRule<T> rule) noexcept {
 
       rules.emplace(*type, rule);
     }
 
-    void setAxiom(const LString& axiom) noexcept {
+    void setAxiom(const LString<T>& axiom) noexcept {
 
       axiom_ = axiom;
     }
 
-    [[nodiscard]] auto axiom() const noexcept -> LString {
+     auto axiom() const noexcept -> LString<T> {
 
       return axiom_;
     }
 
-    [[nodiscard]] auto generate(int generations) const noexcept -> LString {
+     auto generate(int generations) const noexcept -> LString<T> {
 
       auto current = axiom_;
 
       for(int i = 0; i < generations; i++) {
 
-        std::vector<LString> result;
+        std::vector<LString<T>> result;
         result.reserve(current.size());
 
         for(auto symbol = current.begin(); symbol != current.end(); symbol++) {
 
           bool symbolIsTerminal = rules.count(*symbol->type()) == 0;
 
-          LString symbolReplacement;
+          LString<T> symbolReplacement;
 
           if(symbolIsTerminal) {
 
@@ -126,15 +143,15 @@ namespace l_system {
           }
           else {
 
-            LString before = (symbol == current.begin()) ? LString() : LString(current.begin(), symbol - 1);
-            LString after = (symbol == current.end() - 1) ? LString() : LString(symbol + 1, current.end() - 1);
+            auto before = (symbol == current.begin()) ? LString<T>() : LString<T>(current.begin(), symbol - 1);
+            auto after = (symbol == current.end() - 1) ? LString<T>() : LString<T>(symbol + 1, current.end() - 1);
             symbolReplacement = rules.at(*symbol->type())(before, after);
           }
 
           result.emplace_back(symbolReplacement);
         }
 
-        current = std::accumulate(result.begin(), result.end(), LString());
+        current = std::accumulate(result.begin(), result.end(), LString<T>());
       }
 
       return current;
