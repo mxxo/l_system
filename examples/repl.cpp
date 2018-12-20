@@ -51,7 +51,7 @@ int main() {
 
     if(input == "help") { //print help
 
-      std::cout << "This REPL runs with a character represenation" << '\n';
+      std::cout << "This REPL runs with a character representation" << '\n';
       std::cout << "Enter a single character to define it as a symbol." << '\n';
       std::cout << "Enter an expression of the form a->abc.. to add a rule." << '\n';
       std::cout << "Enter an expression of the form (abc..) to set the axiom." << '\n';
@@ -74,7 +74,7 @@ int main() {
       }
       else if(!doesAllSymbolSExist(symbolTypes, to)) {
 
-        std::cout << "Invalid successor" << to << "in rule. Successor contains nonexistant symbols." << '\n';
+        std::cout << "Invalid successor " << to << " in rule. Successor contains nonexistent symbols." << '\n';
       }
       else {
 
@@ -98,7 +98,7 @@ int main() {
       }
       else if(doesSymbolExist(symbolTypes, c)) {
 
-        std::cout << "Symbol " << c << "already exists." << '\n';
+        std::cout << "Symbol " << c << " already exists." << '\n';
       }
       else {
         symbolTypes.insert_or_assign(c, LSymbolType(c));
@@ -111,7 +111,7 @@ int main() {
 
       if(!doesAllSymbolSExist(symbolTypes, axiomString)) {
 
-        std::cout << "Invalid axiom" << axiomString << "contains undefined symbols." << '\n';
+        std::cout << "Invalid axiom (" << axiomString << "); contains undefined symbols." << '\n';
       }
       else {
 
