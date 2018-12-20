@@ -4,8 +4,7 @@
 #include <unordered_map>
 #include <numeric>
 #include <functional>
-
-#include <iostream>
+#include <sstream>
 
 namespace l_system {
 
@@ -26,7 +25,7 @@ namespace l_system {
 
     bool operator==(const LSymbolType &other) const {
 
-      return representation_ == other.representation();
+      return representation() == other.representation();
     }
   };
 
@@ -38,7 +37,7 @@ namespace l_system {
     return res;
   }
 
-  template <typename T, typename H = std::hash<T>>
+  template <typename T, typename H>
   struct LSymbolTypeHash {
 
     size_t operator()(const LSymbolType<T>& k) const {
@@ -67,16 +66,16 @@ namespace l_system {
   using LString = std::basic_string<LSymbol<T>>;
 
   template <typename T>
-   auto represent(const LString<T>& lstring) noexcept -> std::basic_string<T> {
+  auto represent(const LString<T>& lstring) noexcept -> std::string {
 
-    std::basic_string<T> representation;
+    std::ostringstream stream;
 
     for(LSymbol<T> symbol : lstring) {
 
-      representation.push_back(symbol.type()->representation());
+      stream << symbol.type()->representation();
     }
 
-    return representation;
+    return stream.str();
   }
 
   template <typename T>
@@ -96,20 +95,20 @@ namespace l_system {
     }
   };
 
-  template <typename T>
+  template <typename T, typename H = std::hash<T>>
   class LSystem {
 
     LString<T> axiom_;
-    std::unordered_map<LSymbolType<T>, LRule<T>, LSymbolTypeHash<T>> rules;
+    std::unordered_map<LSymbolType<T>, LRule<T>, LSymbolTypeHash<T, H>> rules;
 
   public:
 
     LSystem(LString<T> axiom) : axiom_(axiom) {}
     LSystem(std::initializer_list<LSymbol<T>> axiom) : axiom_(axiom) {}
 
-    void addRule(LSymbolType<T>* type, LRule<T> rule) noexcept {
+    void setRule(LSymbolType<T>* type, LRule<T> rule) noexcept {
 
-      rules.emplace(*type, rule);
+      rules.insert_or_assign(*type, rule);
     }
 
     void setAxiom(const LString<T>& axiom) noexcept {

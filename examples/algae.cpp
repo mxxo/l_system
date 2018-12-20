@@ -1,18 +1,22 @@
+//Basic demonstration of Aristid Lindenmayer's original L-System for modeling the growth of algae.
+//Also demonstrates basic runtime modification of a trivial L-System
+
 #include <iostream>
 #include <cassert>
 #include <stdlib.h>
 
 #include "l_system/l_system.h"
 
-using namespace l_system;
-
 int main(int argc, char const *argv[]) {
+
+  using namespace l_system;
 
   assert(argc >= 2 && "Usage: algae generation");
   int generation = static_cast<int>(strtol(argv[1], nullptr, 0));
 
-  LSymbolType A('A'); //define symbol types
-  LSymbolType B('B');
+  //define symbol types. Any type can be passed to the constructor, so long as they are hashable.
+  LSymbolType A('A'); //true / false, 5 / 6, -0.33 / 99999.3, anything goes
+  LSymbolType B('B'); //if a custom type is used, a custom hash function can be passed to the LSystem constructor.
 
   LSymbol A_(&A); //define symbols needed for axiom and rules
   LSymbol B_(&B);
@@ -22,12 +26,22 @@ int main(int argc, char const *argv[]) {
 
   LSystem algae({LSymbol(&A)}); //define the system using an axiom
 
-  algae.setAxiom({LSymbol(&A)}); //the axiom can also be modified
+  algae.setRule(&A, A_AB); //add the rules to the system
+  algae.setRule(&B, B_A);
 
-  algae.addRule(&A, A_AB); //add the rules to the axiom
-  algae.addRule(&B, B_A);
+  std::cout << "Algae generation " << generation << ": " << represent(algae.generate(generation)) << '\n'; //generate a generation
 
-  std::cout << "Algae generation " << generation << ": " << represent(algae.generate(generation)) << '\n';
+  LSymbolType C('C'); //new symbol types can be designated on the fly
+
+  LSymbol C_(&C); //new symbols as well
+
+  LRule B_CA({C_, A_}); //and new rules
+
+  algae.setRule(&B, B_CA); //the rules can be changed
+
+  algae.setAxiom({A_, C_, C_}); //the axiom can also be modified
+
+  std::cout << "\nAlgae generation " << generation << " with C rule : " << represent(algae.generate(generation)) << '\n'; //and generations can be created again
 
   return 0;
 }
