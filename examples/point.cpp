@@ -14,7 +14,7 @@ class Point { //a simple 2D point class
   int y_;
 
 public:
-  
+
   Point(int x, int y) : x_(x), y_(y) {}
   auto x() const { return x_; }
   auto y() const { return y_; }
@@ -52,16 +52,16 @@ int main(int argc, char const *argv[]) {
   LSymbolType A(Point(5, 3)); //define symbol types
   LSymbolType B(Point(2, 6));
 
-  LSymbol A_(&A); //define symbol instances needed for axiom and rules
-  LSymbol B_(&B);
+  LSymbol A_(A); //define symbol instances needed for axiom and rules
+  LSymbol B_(B);
 
   LRule A_AB({A_, B_}); //define rules
   LRule B_A({A_});
 
-  LSystem<Point, PointHash> points({LSymbol(&A)}); //custom hash types require explicit template declaration for the LSystem type
+  LSystem<Point, PointHash> points({LSymbol(A)}); //custom hash types require explicit template declaration for the LSystem type
 
-  points.setRule(&A, A_AB); //add the rules to the system
-  points.setRule(&B, B_A);
+  points.setRule(A, A_AB); //add the rules to the system
+  points.setRule(B, B_A);
 
   std::cout << "Points generation " << generation << ": " << represent(points.generate(generation)) << '\n';
 

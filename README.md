@@ -1,5 +1,10 @@
 # l_system
-A fast, flexible, general, work in progress lindenmayer-like system evaluation library in C++.
+A C++ lindenmayer-like system evaluation library that is:
+- fast
+- flexible
+- general
+- header only
+- very work in progress
 ## Fast
 The runtime complexity of any given l system is completely dependent on the axiom and rules of that system.
 That being said, this library aims to generate as fast as possible.

@@ -31,9 +31,9 @@ namespace l_system {
   };
 
   template <typename T>
-  LSymbolType<T>* NullLSymbol() {
+  LSymbolType<T> NullLSymbol() {
 
-    static LSymbolType<T>* res = new LSymbolType<T>();
+    static LSymbolType<T> res;
 
     return res;
   }
@@ -50,14 +50,14 @@ namespace l_system {
   template <typename T>
   class LSymbol {
 
-    LSymbolType<T>* type_;
+    LSymbolType<T> type_;
 
   public:
-    LSymbol(LSymbolType<T>* type) : type_(type) {}
+    LSymbol(LSymbolType<T> type) : type_(type) {}
 
     LSymbol() : type_(NullLSymbol<T>()) {}
 
-     auto type() const noexcept -> LSymbolType<T>* {
+     auto type() const noexcept -> LSymbolType<T> {
 
       return type_;
     }
@@ -73,7 +73,7 @@ namespace l_system {
 
     for(LSymbol<T> symbol : lstring) {
 
-      stream << symbol.type()->representation();
+      stream << symbol.type().representation();
     }
 
     return stream.str();
@@ -107,9 +107,9 @@ namespace l_system {
     LSystem(LString<T> axiom) : axiom_(axiom) {}
     LSystem(std::initializer_list<LSymbol<T>> axiom) : axiom_(axiom) {}
 
-    void setRule(LSymbolType<T>* type, LRule<T> rule) noexcept {
+    void setRule(LSymbolType<T> type, LRule<T> rule) noexcept {
 
-      rules.insert_or_assign(*type, rule);
+      rules.insert_or_assign(type, rule);
     }
 
     void setAxiom(const LString<T>& axiom) noexcept {
@@ -133,7 +133,7 @@ namespace l_system {
 
         for(auto symbol = current.begin(); symbol != current.end(); symbol++) {
 
-          bool symbolIsTerminal = rules.count(*symbol->type()) == 0;
+          bool symbolIsTerminal = rules.count(symbol->type()) == 0;
 
           LString<T> symbolReplacement;
 
@@ -145,7 +145,7 @@ namespace l_system {
 
             auto before = (symbol == current.begin()) ? LString<T>() : LString<T>(current.begin(), symbol - 1);
             auto after = (symbol == current.end() - 1) ? LString<T>() : LString<T>(symbol + 1, current.end() - 1);
-            symbolReplacement = rules.at(*symbol->type())(before, after);
+            symbolReplacement = rules.at(symbol->type())(before, after);
           }
 
           result.emplace_back(symbolReplacement);
