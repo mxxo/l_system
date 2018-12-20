@@ -126,7 +126,7 @@ namespace l_system {
 
       auto current = axiom_;
 
-      for(int i = 0; i < generations; i++) {
+      for(int i = 0; i < generations; ++i) {
 
         std::vector<LString<T>> result;
         result.reserve(current.size());
